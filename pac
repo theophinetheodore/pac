@@ -11,19 +11,29 @@ fzf_flags="--multi --preview-window=top,45% --margin 5% --info=inline"
 ## functions ##########################################
 
 function depcheck() {
-	if [[ -z $(command -v fzf) ]]; then
-		printf "fzf not found. Please install it.\n" >&2
+	if [[ -z $(command -v $1) ]]; then
+		printf "$1 not found. Please install it.\n" >&2
 		exit 2
 	fi
 }
 
 function interactive() {
-	depcheck
+	depcheck "fzf"
 
 	pacman -Sl | fzf --preview="pacman -Si {1}/{2}" \
 		--bind "enter:execute($power pacman -S {1}/{2})" \
 		--bind "ctrl-r:execute($power pacman -Rns {1}/{2})" \
 			$fzf_flags
+}
+
+function aur_interactive() {
+	depcheck "fzf"
+	depcheck "yay"
+
+	# yay -a only provides AUR packages
+	yay -Sla | fzf --preview="yay -Gp aur/{2}" \
+		--bind "enter:execute(yay -S {1}/{2})" \
+		--info=inline --preview-window=right,60%
 }
 
 function help() {
@@ -57,6 +67,8 @@ case $1 in
 		$power pacman -S ${@:2} ;;
 	"interactive")
 		interactive ;;
+	"aur")
+		aur_interactive ;;
 	"r")
 		$power pacman -Rns ${@:2} ;;
 	"orphan")
@@ -82,6 +94,6 @@ case $1 in
 	"" | "h" | "help")
 		help ;;
 	*)
-		echo "bruh.exe stopped working"
-		;;
+		echo "ERROR: Provided subcommand not found."
+		help ;;
 esac
