@@ -45,8 +45,7 @@ A lil pacman wrapper.
   i [PKGS]        install packages
   interactive     install packages interactively
   r [PKGS]        remove packages
-  u               update repositories & upgrade packages;
-                  can mention package to install alongside upgrade
+  u               update repositories & upgrade packages
   s [ARG]         search for packages
   l               list installed packages
   info [PKG]      show information about a package
@@ -74,7 +73,11 @@ case $1 in
 	"orphan")
 		pacman -Qdttq ;;
 	"autoremove")
-		$power pacman -Rns `pacman -Qdttq` ;;
+		if [[ $(pacman -Qdttq) != "" ]]; then
+			$power pacman -Rns `pacman -Qdttq`
+		else
+			echo "No orphaned packages to remove."
+		fi ;;
 	"s")
 		pacman -Ss ${@:2} ;;
 	"u")
@@ -82,9 +85,9 @@ case $1 in
 	"info")
 		pacman -Si ${@:2} ;;
 	"files")
-		pacman -Fl ${@:2} ;;
+		pacman -Ql ${@:2} ;;
 	"clean")
-		$power pacman -Scc --noconfirm ;;
+		$power pacman -Scc ;;
 	"cache-size")
 		du -sh /var/cache/pacman/pkg | awk '{print $1}' ;;
 	"l")
