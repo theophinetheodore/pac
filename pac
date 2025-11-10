@@ -44,6 +44,7 @@ A lil pacman wrapper.
 
   i [PKGS]        install packages
   interactive     install packages interactively
+  aur             install AUR packages interactively
   r [PKGS]        remove packages
   u               update repositories & upgrade packages
   s [ARG]         search for packages
